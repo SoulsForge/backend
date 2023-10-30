@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  username      String          @unique
+  password      String
+  role          Role            @default(USER)
+  BaseCharacter BaseCharacter[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+}
+
+model BaseCharacter {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  description        String
+  imageUrl           String?
+  game               Game                 @relation(fields: [gameId], references: [id])
+  gameId             Int
+  user               User                 @relation(fields: [userId], references: [id])
+  userId             Int
+  EldenRingCharacter EldenRingCharacter[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now()) @updatedAt
+}
+
+model Game {
+  id            Int             @id @default(autoincrement())
+  name          String
+  baseCharacter BaseCharacter[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+}
+
+model EldenRingCharacter {
+  id              Int                @id @default(autoincrement())
+  baseCharacter   BaseCharacter      @relation(fields: [baseCharacterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  baseCharacterId Int
+  atributes       AtributesEldenRing @relation(fields: [atributesId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  atributesId     Int
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @default(now()) @updatedAt
+}
+
+model AtributesEldenRing {
+  id                   Int                  @id @default(autoincrement())
+  body_type            String
+  age                  String
+  voice                String
+  skin_color           Json
+  face_template        Json
+  face_balance         Json
+  forehead             Json
+  brow_ridge           Json
+  eyes                 Json
+  nose_ridge           Json
+  nostrils             Json
+  cheeks               Json
+  lips                 Json
+  mouth                Json
+  chin                 Json
+  jaw                  Json
+  hair                 Json
+  eyebrows             Json
+  facial_hair          Json
+  eyelashes            Json
+  right_eye            Json
+  left_eye             Json
+  skin_features        Json
+  cosmetics            Json
+  tattoo_mark_eyepatch Json
+  body                 Json
+  EldenRingCharacter   EldenRingCharacter[]
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @default(now()) @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+}
