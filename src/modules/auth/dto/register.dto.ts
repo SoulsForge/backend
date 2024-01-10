@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Validate } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, Validate } from 'class-validator';
 import { CustomPasswordValidator } from 'src/common/validators/CustomPasswordValidator';
 
 export class RegisterDto {
@@ -12,4 +12,7 @@ export class RegisterDto {
   @IsNotEmpty()
   @Validate(CustomPasswordValidator)
   password: string;
+
+  @IsOptional()
+  imageUrl: string;
 }

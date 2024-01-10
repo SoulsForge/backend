@@ -1,15 +1,26 @@
-import { Prisma, User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../database/database.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: Prisma.UserCreateInput) {
-    return this.prisma.user.create({ data: createUserDto });
+  async create(createUserDto: CreateUserDto) {
+    return this.prisma.user.create({
+      data: {
+        username: createUserDto.username,
+        email: createUserDto.email,
+        lowerUsername: createUserDto.lowerUsername,
+        imageUrl: createUserDto.imageUrl,
+        password: createUserDto.password,
+        role: createUserDto.role,
+        settings: {
+          create: {},
+        },
+      },
+    });
   }
 
   findAll() {
@@ -53,32 +64,43 @@ export class UserService {
     return user;
   }
 
-  findByUsername(username: string, select: Prisma.UserSelect = null) {
-    const user = this.prisma.user.findUnique({
+  async findByUsername(username: string, select: Prisma.UserSelect) {
+    const usernameLower = username.toLowerCase();
+
+    const user = await this.prisma.user.findUnique({
       where: {
-        username,
+        lowerUsername: usernameLower,
       },
       select,
     });
 
     if (!user) {
-      return null;
+      throw new NotFoundException(`Not found user with username ${username}`);
     }
 
     return user;
   }
+
   async findProfile(userId: number) {
     const user = this.prisma.user.findUnique({
       where: {
         id: userId,
       },
-      include: {
-        BaseCharacter: true,
+      select: {
+        id: true,
+        imageUrl: true,
+        username: true,
+        createdAt: true,
+        email: true,
+        updatedAt: true,
+        BaseCharacter: {
+          include: { game: true, user: true, EldenRingCharacter: true },
+        },
       },
     });
 
     if (!user) {
-      return null;
+      throw new NotFoundException();
     }
 
     return user;

@@ -20,6 +20,7 @@ export class EldenRingCharacterController {
   constructor(
     private readonly eldenRingCharacterService: EldenRingCharacterService,
   ) {}
+
   @UseGuards(JwtAuthGuard)
   @Post()
   create(
@@ -31,6 +32,7 @@ export class EldenRingCharacterController {
 
     return this.eldenRingCharacterService.create(characterDto);
   }
+
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
@@ -38,20 +40,24 @@ export class EldenRingCharacterController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eldenRingCharacterService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.eldenRingCharacterService.findOne(+id);
   }
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateEldenRingCharacterDto: UpdateEldenRingCharacterDto,
   ) {
+    console.log('monkakaka', updateEldenRingCharacterDto);
+
     return this.eldenRingCharacterService.update(
       +id,
       updateEldenRingCharacterDto,
     );
   }
+
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {

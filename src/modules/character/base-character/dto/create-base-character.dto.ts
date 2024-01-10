@@ -16,4 +16,8 @@ export class CreateBaseCharacterDto {
 
   @IsInt()
   userId: number;
+
+  @IsOptional()
+  @IsInt()
+  specificCharacterId?: number;
 }

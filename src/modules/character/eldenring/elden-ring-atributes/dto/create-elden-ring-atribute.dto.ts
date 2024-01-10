@@ -1,6 +1,6 @@
 import { IsObject, IsString } from 'class-validator';
 
-export class CreateEldenRingAtributeDto {
+export class CreateEldenRingAttributeDto {
   @IsString()
   body_type: string;
   @IsString()

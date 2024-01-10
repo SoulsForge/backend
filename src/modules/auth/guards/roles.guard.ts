@@ -22,8 +22,6 @@ export class RolesGuard implements CanActivate {
 
     const isMatch = matchRoles(roles, user.role);
 
-    console.log('isMAtch', isMatch);
-
     return isMatch;
   }
 }

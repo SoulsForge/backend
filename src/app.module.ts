@@ -12,9 +12,11 @@ import { GameModule } from './modules/game/game.module';
 import { BaseCharacterModule } from './modules/character/base-character/base-character.module';
 import { EldenRingCharacterModule } from './modules/character/eldenring/elden-ring-character/elden-ring-character.module';
 import { EldenRingAtributesModule } from './modules/character/eldenring/elden-ring-atributes/elden-ring-atributes.module';
+import { ProfileModule } from './modules/profile/profile.module';
 
 @Module({
   imports: [
+    ProfileModule,
     UserModule,
     DatabaseModule,
     AuthModule,

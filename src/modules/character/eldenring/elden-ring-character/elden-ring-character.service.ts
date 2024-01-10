@@ -2,9 +2,7 @@ import { EldenRingAtributesService } from './../elden-ring-atributes/elden-ring-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEldenRingCharacterDto } from './dto/create-elden-ring-character.dto';
 import { UpdateEldenRingCharacterDto } from './dto/update-elden-ring-character.dto';
-import { CreateEldenRingAtributeDto } from '../elden-ring-atributes/dto/create-elden-ring-atribute.dto';
 import { PrismaService } from 'src/modules/database/database.service';
-import { CreateBaseCharacterDto } from '../../base-character/dto/create-base-character.dto';
 import { BaseCharacterService } from '../../base-character/base-character.service';
 
 @Injectable()
@@ -16,23 +14,29 @@ export class EldenRingCharacterService {
   ) {}
 
   async create(eldenRingCharacterDto: CreateEldenRingCharacterDto) {
-    const { characterDto, atributesDto } = eldenRingCharacterDto;
+    const { characterDto, attributesDto } = eldenRingCharacterDto;
 
     // create base character
     const { id: baseCharId } =
       await this.baseCharacterService.create(characterDto);
 
-    // create atributes
-    const { id: atributesId } =
-      await this.eldenRingAtributesService.create(atributesDto);
+    // create attributes
+    const { id: attributesId } =
+      await this.eldenRingAtributesService.create(attributesDto);
 
     const eldenRingCharacter = await this.prisma.eldenRingCharacter.create({
       data: {
         baseCharacter: { connect: { id: baseCharId } },
-        atributes: { connect: { id: atributesId } },
+        attributes: { connect: { id: attributesId } },
       },
-      include: { baseCharacter: true, atributes: true },
+      include: { baseCharacter: true, attributes: true },
     });
+
+    const modBaseChar = await this.baseCharacterService.update(baseCharId, {
+      specificCharacterId: eldenRingCharacter.id,
+    });
+
+    eldenRingCharacter.baseCharacter = modBaseChar;
 
     return eldenRingCharacter;
   }
@@ -41,15 +45,21 @@ export class EldenRingCharacterService {
     return `This action returns all eldenRingCharacter`;
   }
 
-  findOne(id: number) {
-    const char = this.prisma.eldenRingCharacter.findUnique({
-      where: { id },
-      include: { baseCharacter: true, atributes: true },
-    });
+  async findOne(id: number) {
+    try {
+      const char = await this.prisma.eldenRingCharacter.findUnique({
+        where: { id },
+        include: {
+          baseCharacter: { include: { game: true, user: true } },
+          attributes: true,
+        },
+      });
 
-    if (!char) throw new NotFoundException();
-
-    return char;
+      if (!char) throw new NotFoundException();
+      return char;
+    } catch (e) {
+      console.log('error ER findone', e.message);
+    }
   }
 
   async update(
@@ -60,7 +70,7 @@ export class EldenRingCharacterService {
 
     if (!char) throw new NotFoundException();
 
-    const { baseCharacterId, atributesId } = char;
+    const { baseCharacterId, attributesId } = char;
 
     // update base character
     await this.baseCharacterService.update(
@@ -68,17 +78,17 @@ export class EldenRingCharacterService {
       updateEldenRingCharacterDto.characterDto,
     );
 
-    // update atributes
+    // update attributes
     await this.eldenRingAtributesService.update(
-      atributesId,
-      updateEldenRingCharacterDto.atributesDto,
+      attributesId,
+      updateEldenRingCharacterDto.attributesDto,
     );
 
     const modChar = await this.prisma.eldenRingCharacter.update({
       data: {},
       where: { id },
       include: {
-        atributes: true,
+        attributes: true,
         baseCharacter: true,
       },
     });

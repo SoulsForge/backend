@@ -17,7 +17,8 @@ export class UserController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const lowerUsername = createUserDto.username.toLowerCase();
+    return this.userService.create({ ...createUserDto, lowerUsername });
   }
 
   @Get()

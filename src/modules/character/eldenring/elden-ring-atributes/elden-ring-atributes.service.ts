@@ -1,40 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEldenRingAtributeDto } from './dto/create-elden-ring-atribute.dto';
-import { UpdateEldenRingAtributeDto } from './dto/update-elden-ring-atribute.dto';
+import { CreateEldenRingAttributeDto } from './dto/create-elden-ring-atribute.dto';
+import { UpdateEldenRingAttributeDto } from './dto/update-elden-ring-attribute.dto';
 import { PrismaService } from 'src/modules/database/database.service';
 
 @Injectable()
 export class EldenRingAtributesService {
   constructor(private readonly prisma: PrismaService) {}
-  async create(createEldenRingAtributeDto: CreateEldenRingAtributeDto) {
-    const atributesEldenRing = await this.prisma.atributesEldenRing.create({
+
+  async create(createEldenRingAtributeDto: CreateEldenRingAttributeDto) {
+    const attributesEldenRing = await this.prisma.attributesEldenRing.create({
       data: createEldenRingAtributeDto,
     });
 
-    return atributesEldenRing;
+    return attributesEldenRing;
   }
 
   async findAll() {
-    return await this.prisma.atributesEldenRing.findMany();
+    return await this.prisma.attributesEldenRing.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} eldenRingAtribute`;
+    return `This action returns a #${id} eldenRingAttribute`;
   }
 
   async update(
     id: number,
-    updateEldenRingAtributeDto: UpdateEldenRingAtributeDto,
+    updateEldenRingAttributeDto: UpdateEldenRingAttributeDto,
   ) {
-    return await this.prisma.atributesEldenRing.update({
+    return await this.prisma.attributesEldenRing.update({
       where: {
         id,
       },
-      data: updateEldenRingAtributeDto,
+      data: updateEldenRingAttributeDto,
     });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} eldenRingAtribute`;
+    return `This action removes a #${id} eldenRingAttribute`;
   }
 }

@@ -16,11 +16,12 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() payload: RegisterDto) {
+    console.log(payload);
     return await this.authService.register(payload);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('dashboard')
   async profile(@Req() { user }) {
     return await this.authService.getProfile(user.userId);
   }

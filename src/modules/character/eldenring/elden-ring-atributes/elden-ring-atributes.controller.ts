@@ -9,8 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EldenRingAtributesService } from './elden-ring-atributes.service';
-import { CreateEldenRingAtributeDto } from './dto/create-elden-ring-atribute.dto';
-import { UpdateEldenRingAtributeDto } from './dto/update-elden-ring-atribute.dto';
+import { CreateEldenRingAttributeDto } from './dto/create-elden-ring-atribute.dto';
+import { UpdateEldenRingAttributeDto } from './dto/update-elden-ring-attribute.dto';
 import { $Enums } from '@prisma/client';
 import { Roles } from 'src/modules/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
@@ -25,7 +25,7 @@ export class EldenRingAtributesController {
   ) {}
 
   @Post()
-  create(@Body() createEldenRingAtributeDto: CreateEldenRingAtributeDto) {
+  create(@Body() createEldenRingAtributeDto: CreateEldenRingAttributeDto) {
     return this.eldenRingAtributesService.create(createEldenRingAtributeDto);
   }
 
@@ -42,7 +42,7 @@ export class EldenRingAtributesController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateEldenRingAtributeDto: UpdateEldenRingAtributeDto,
+    @Body() updateEldenRingAtributeDto: UpdateEldenRingAttributeDto,
   ) {
     return this.eldenRingAtributesService.update(
       +id,

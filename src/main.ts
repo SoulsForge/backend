@@ -10,7 +10,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
 
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  // app.useGlobalInterceptors(new LoggingInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -22,4 +22,5 @@ async function bootstrap() {
 
   await app.listen(6661);
 }
+
 bootstrap();
