@@ -50,8 +50,6 @@ export class EldenRingCharacterController {
     @Param('id') id: string,
     @Body() updateEldenRingCharacterDto: UpdateEldenRingCharacterDto,
   ) {
-    console.log('monkakaka', updateEldenRingCharacterDto);
-
     return this.eldenRingCharacterService.update(
       +id,
       updateEldenRingCharacterDto,
