@@ -1,11 +1,9 @@
 import { Router } from 'express';
 import { Routes } from '@/interfaces/routes.interface';
-import { TestController } from '@/features/test/test.controller';
 
 export class HealthRoute implements Routes {
   public path = '/';
   public router = Router();
-  private testController = new TestController();
 
   constructor() {
     this.initializeRoutes();
@@ -18,7 +16,5 @@ export class HealthRoute implements Routes {
         timestamp: new Date().toISOString(),
       });
     });
-
-    this.router.post(`/test`, this.testController.createTest);
   }
 }
