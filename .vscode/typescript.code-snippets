@@ -1,0 +1,44 @@
+{
+  "Create Route": {
+    "prefix": "route",
+    "body": [
+      "import { Router } from 'express';",
+      "import { Routes } from '@/interfaces/routes.interface';",
+      "",
+      "export class ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/} implements Routes {",
+      "  public path = \"/${TM_FILENAME_BASE/(.*)\\..+$/$1/}\";",
+      "  public router = Router();",
+      "",
+      "  constructor() {",
+      "    this.initializeRoutes();",
+      "  }",
+      "",
+      "  private initializeRoutes() {}",
+      "}",
+      ""
+    ],
+    "description": "Creates a new route file"
+  },
+  "Create Controller":{
+    "prefix": "controller",
+    "body": [
+      "import { NextFunction, Request, Response } from 'express';",
+      "",
+      "export class ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/} {",
+      "}",
+      ""
+    ],
+    "description": "Creates a new controller file"
+  },
+  "Create Service":{
+    "prefix": "service",
+    "body": [
+      "import prisma from '@modules/db/prisma.service';",
+      "",
+      "export class ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/} {",
+      "}",
+      ""
+    ],
+    "description": "Creates a new service file"
+  },
+}
