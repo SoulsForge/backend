@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { ErrorMiddleware } from './middlewares/error.middleware';
 import { Routes } from '@interfaces/routes.interface';
 import compression from 'compression';
@@ -52,7 +54,7 @@ export class App {
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
       logger.info(`Route added: ${route.path}`);
-      this.app.use('/', route.router);
+      this.app.use('/api', route.router);
     });
   }
 
