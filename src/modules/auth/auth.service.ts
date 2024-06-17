@@ -36,7 +36,17 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = findUser;
 
-    return { cookie, data: userWithoutPassword };
+    return { cookie, data: { ...userWithoutPassword, token: tokenData.token } };
+  }
+
+  async logout(userData: any) {
+    const findUser = await prisma.user.findFirst({ where: { email: userData.email } });
+    if (!findUser) throw new HttpException(409, `This email ${userData.email} was not found`);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = findUser;
+
+    return { data: userWithoutPassword };
   }
 
   private createToken(user: User) {

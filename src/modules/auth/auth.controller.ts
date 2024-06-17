@@ -39,7 +39,15 @@ export class AuthController {
     }
   };
 
-  public logout = async (req: Request, res: Response) => {
-    res.send('Logout');
+  public logout = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userData = req.body;
+      const logoutUserData = await this.authService.logout(userData);
+
+      res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
+      res.status(200).json({ data: logoutUserData, message: 'logout' });
+    } catch (error) {
+      next(error);
+    }
   };
 }

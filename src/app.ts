@@ -18,9 +18,12 @@ export class App {
   public port: string | number;
 
   constructor(routes: Routes[]) {
-    this.app = express();
     this.env = env.NODE_ENV;
     this.port = env.PORT;
+
+    logger.info(`=================================`);
+    logger.info(`ENV: ${this.env} `);
+    this.app = express();
 
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
@@ -29,8 +32,6 @@ export class App {
 
   public listen() {
     this.app.listen(this.port, () => {
-      logger.info(`=================================`);
-      logger.info(`ENV: ${this.env} `);
       logger.info(`🚀 App listening on the port ${this.port}`);
       logger.info(`=================================`);
     });

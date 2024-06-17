@@ -25,10 +25,11 @@ model User {
 model Character {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
   name       String
-  gameId     Game
+  game     Game
   createdBy  String @db.ObjectId
   user       User @relation(fields: [createdBy], references: [id])
   details    Detail[]
+  image_url  String?
 }
 
 model Detail {
@@ -39,13 +40,11 @@ model Detail {
   subdetails    Subdetail[]
 }
 
-model Subdetail {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  type       String
-  value      Json
-  detailId   String @db.ObjectId
-  detail     Detail @relation(fields: [detailId], references: [id])
+
+type Subdetail {
+  name String
+  type SubdetailType
+  value Json?
 }
 
 enum Game{
@@ -54,4 +53,11 @@ enum Game{
   BLOODBORNE
   DARK_SOULS_3
   DARK_SOULS_2
+}
+
+enum SubdetailType{
+  STRING
+  NUMBER
+  BOOLEAN
+  COLOR
 }

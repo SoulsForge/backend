@@ -7,14 +7,16 @@ import prisma from '@modules/db/prisma.service';
 
 @Service()
 export class UserService {
-  public findUserById = async (userId: string): Promise<User> => {
+  public findUserById = async (userId: string) => {
     if (userId.length !== 24) {
       throw new Error('Invalid userId format');
     }
     const findUser = await prisma.user.findUnique({ where: { id: userId } });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
-    return findUser;
+    const user = findUser;
+
+    return user;
   };
 
   public createUser = async (userData: CreateUserDto): Promise<User> => {
