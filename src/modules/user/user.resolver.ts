@@ -1,10 +1,15 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { Logger } from '@nestjs/common';
-import { UserEntity } from './user.entity';
+import { Logger, UseGuards } from '@nestjs/common';
+import { UserEntity } from './entities/user.entity';
 import { UserService } from './user.service';
-import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { GqlJwtGuard } from '../auth/guards/gql-jwt-guard/gql-jwt-guard.guard';
+import { JwtUser } from '../auth/types/jwt-user';
+import { Role } from '@prisma/client';
+import { RolesGuard } from '../auth/guards/roles/roles.guard';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Resolver(() => UserEntity)
 export class UserResolver {
@@ -19,28 +24,30 @@ export class UserResolver {
   }
 
   @Query(() => UserEntity)
-  async getUser(@Args('id') id: string) {
+  async getUser(@Args('id') id: number) {
     this.logger.debug(`Fetching user with id ${id}`);
     return await this.userService.findOne(id);
   }
 
-  @Mutation(() => UserEntity)
-  async createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return await this.userService.create(createUserInput);
-  }
+  // @Mutation(() => UserEntity)
+  // async createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+  //   return await this.userService.create(createUserInput);
+  // }
 
+  @Roles(Role.ADMIN)
+  @UseGuards(GqlJwtGuard, RolesGuard)
   @Mutation(() => UserEntity)
   async updateUser(
-    @Args('id') id: string,
+    @GetUser() user: JwtUser,
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
   ) {
-    return this.userService.update(id, updateUserInput);
+    return this.userService.update(user.userId, updateUserInput);
   }
 
-  @Mutation(() => UserEntity)
-  async removeUser(@Args('id') id: string) {
-    return this.userService.remove(id);
-  }
+  // @Mutation(() => UserEntity)
+  // async removeUser(@Args('id') id: string) {
+  //   return this.userService.remove(id);
+  // }
 
   // @ResolveField('profile')
   // getProfile(@Parent() user: UserEntity) {

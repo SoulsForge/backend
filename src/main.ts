@@ -10,6 +10,10 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe());
 
+  app.enableCors({
+    origin: [process.env['FRONTEND_SERVER']],
+  });
+
   // filters
   app.useGlobalFilters(new PrismaClientExceptionFilter());
 
