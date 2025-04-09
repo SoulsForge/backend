@@ -14,14 +14,28 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  email     String      @unique
-  username  String      @unique
-  password  String
-  role      Role        @default(USER)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  Character Character[]
+  id               Int         @id @default(autoincrement())
+  email            String      @unique
+  emailVerified    Boolean     @default(false)
+  verificationCode String?
+  username         String      @unique
+  password         String
+  role             Role        @default(USER)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  Character        Character[]
+  profile          Profile?
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  avatar String?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Game {
@@ -36,10 +50,10 @@ model Character {
   description String?
   image_url   String?
 
-  game Game @relation(fields: [gameId], references: [id])
+  game   Game @relation(fields: [gameId], references: [id])
   gameId Int
 
-  user User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
   userId Int
 
   sliders Json
