@@ -15,6 +15,9 @@ import { PrismaService } from './prisma/prisma.service';
 import { TimelineModule } from './modules/timeline/timeline.module';
 import { UserModule } from './modules/user/user.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { SearchModule } from './modules/search/search.module';
+import { EmailService } from './modules/email/email.service';
+import { EmailModule } from './modules/email/email.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -37,6 +40,8 @@ import configuration from './config/configuration';
     CharacterModule,
     TimelineModule,
     ProfileModule,
+    SearchModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [
@@ -46,6 +51,7 @@ import configuration from './config/configuration';
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
+    EmailService,
   ],
 })
 export class AppModule {

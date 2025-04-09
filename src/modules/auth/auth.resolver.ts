@@ -32,4 +32,11 @@ export class AuthResolver {
   async verify(@GetUser() user: JwtUser) {
     return await this.authService.verify(user.userId);
   }
+
+  @UseGuards(GqlJwtGuard)
+  @Mutation(() => UserEntity)
+  async verifyEmail(@GetUser() user: JwtUser, @Args('code') code: string) {
+    this.logger.log(user.userId, code);
+    return await this.authService.verifyEmail(user.userId, code);
+  }
 }

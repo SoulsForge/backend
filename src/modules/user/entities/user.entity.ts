@@ -9,6 +9,11 @@ export class UserEntity implements User {
   @Field()
   email: string;
 
+  @Field(() => Boolean)
+  emailVerified: boolean;
+
+  verificationCode: string | null;
+
   @Field()
   username: string;
 

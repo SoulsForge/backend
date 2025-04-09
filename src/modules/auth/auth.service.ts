@@ -4,12 +4,14 @@ import {
   BadRequestException,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 
 import { AuthJwtPayload } from './types/auth-jwt.payload';
 import { AuthPayload } from './entities/auth-payload';
 import { CreateUserInput } from '../user/dto/create-user.input';
+import { EmailService } from '../email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtUser } from './types/jwt-user';
 import { SignInInput } from './dto/sign-in.input';
@@ -23,6 +25,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(data: CreateUserInput) {
@@ -30,7 +33,38 @@ export class AuthService {
     data.password = hashedPassword;
 
     try {
-      return await this.userService.create(data);
+      const newUser = await this.userService.create(data);
+
+      const { verificationCode } = newUser;
+
+      const redirectUrl = new URL(
+        `${process.env.FRONTEND_SERVER}/verify-email`,
+      );
+
+      const token = await this.generateToken(newUser.id);
+
+      redirectUrl.searchParams.append('code', verificationCode || '');
+      redirectUrl.searchParams.append('token', token.accessToken);
+
+      const htmlBody = `<h1>Welcome to SoulsForge</h1>
+      <p>To verify your email, please use the following code:</p>
+      <h2>${verificationCode}</h2>
+      <br />
+      <div>
+        <p>Otherwise, you can click the link below:</p>
+        <a href="${redirectUrl.toString()}">Verify Email</a>
+        <strong>Note:</strong> This link will expire in 30 days.
+      </div>
+      <p>If you didn't create an account, please ignore this email.</p>`;
+
+      await this.emailService.sendMail(
+        'accounts',
+        newUser.email,
+        'SoulsForge - Verify your email',
+        htmlBody,
+      );
+
+      return newUser;
     } catch (e) {
       this.logger.error(e);
 
@@ -60,6 +94,29 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async verifyEmail(userId: number, code: string) {
+    const user = await this.userService.findOne(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const verifyCode = user.verificationCode;
+    if (!verifyCode) {
+      throw new BadRequestException('User already verified');
+    }
+
+    if (verifyCode !== code) {
+      throw new BadRequestException('Invalid verification code');
+    }
+
+    user.emailVerified = true;
+    user.verificationCode = null;
+    const newUser = await this.userService.update(userId, user);
+
+    return newUser;
   }
 
   async validateLocalUser({ username, password }: SignInInput) {

@@ -1,6 +1,7 @@
 import { CreateUserInput } from './dto/create-user.input';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Query } from '@nestjs/graphql';
 import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
@@ -24,7 +25,12 @@ export class UserService {
   }
 
   async create(data: CreateUserInput) {
-    return await this.prisma.user.create({ data });
+    return await this.prisma.user.create({
+      data: {
+        ...data,
+        verificationCode: this.createRandomCode(6),
+      },
+    });
   }
 
   async update(id: number, updateUserInput: UpdateUserInput) {
@@ -38,5 +44,20 @@ export class UserService {
     return await this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  private createRandomCode(size: number): string {
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    let result = '';
+
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < size; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
   }
 }
