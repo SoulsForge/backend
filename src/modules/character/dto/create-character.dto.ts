@@ -19,6 +19,6 @@ export class CreateCharacterInput {
   @IsOptional()
   image_url: string;
 
-  @Field()
+  @Field(() => EldenRingCharacterDto)
   sliders: EldenRingCharacterDto;
 }

@@ -17,16 +17,18 @@ export class UserResolver {
 
   constructor(private readonly userService: UserService) {}
 
-  @Query(() => [UserEntity], { name: 'users' })
-  async findAll() {
-    this.logger.debug('Fetching all users');
-    return await this.userService.findMany();
-  }
+  // @Query(() => [UserEntity], { name: 'users' })
+  // async findAll() {
+  //   this.logger.debug('Fetching all users');
+  //   return await this.userService.findMany();
+  // }
 
   @Query(() => UserEntity)
   async getUser(@Args('id') id: number) {
-    this.logger.debug(`Fetching user with id ${id}`);
-    return await this.userService.findOne(id);
+    return await this.userService.findOne({
+      where: { id },
+      include: { profile: true, Character: true },
+    });
   }
 
   // @Mutation(() => UserEntity)

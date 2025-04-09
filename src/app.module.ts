@@ -6,18 +6,18 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AuthService } from './modules/auth/auth.service';
 import { CharacterModule } from './modules/character/character.module';
 import { ConfigModule } from '@nestjs/config';
+import { EmailModule } from './modules/email/email.module';
+import { EmailService } from './modules/email/email.service';
 import GraphQLJSON from 'graphql-type-json';
 import { GraphQLModule } from '@nestjs/graphql';
 import { LoggingInterceptor } from './common/logging/logging.interceptor';
 import { LoggingMiddleware } from './common/logging/logging.middleware';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
-import { TimelineModule } from './modules/timeline/timeline.module';
-import { UserModule } from './modules/user/user.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { SearchModule } from './modules/search/search.module';
-import { EmailService } from './modules/email/email.service';
-import { EmailModule } from './modules/email/email.module';
+import { TimelineModule } from './modules/timeline/timeline.module';
+import { UserModule } from './modules/user/user.module';
 import configuration from './config/configuration';
 
 @Module({

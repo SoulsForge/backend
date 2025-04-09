@@ -8,4 +8,5 @@ export default () => ({
     smtpUsername: process.env.SMTP_USERNAME,
     smtpPassword: process.env.SMTP_PASSWORD,
   },
+  frontendUrl: process.env.FRONTEND_SERVER,
 });

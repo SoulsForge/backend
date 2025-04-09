@@ -31,6 +31,18 @@ export class CharacterResolver {
     return await this.characterService.getById(id);
   }
 
+  @Query(() => [CharacterEntity])
+  async getEldenRingCharacters(@Args('userId') userId: number) {
+    return await this.characterService.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        game: true,
+        user: true,
+      },
+    });
+  }
+
   @UseGuards(GqlJwtGuard)
   @Mutation(() => CharacterEntity)
   async updateEldenRingCharacter(

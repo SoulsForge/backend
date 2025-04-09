@@ -87,7 +87,7 @@ export class AuthService {
   }
 
   async verify(userId: number) {
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.findOne({ where: { id: userId }, include:{profile:true} });
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -97,7 +97,7 @@ export class AuthService {
   }
 
   async verifyEmail(userId: number, code: string) {
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.findOne({ where: { id: userId } });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -120,9 +120,12 @@ export class AuthService {
   }
 
   async validateLocalUser({ username, password }: SignInInput) {
-    let user: UserEntity;
+    let user;
     try {
-      user = await this.userService.findByUsername(username);
+      user = await this.userService.findOne({
+        where: { username },
+        include: { profile: true },
+      });
     } catch (e) {
       this.logger.error(e);
       throw new UnauthorizedException('Invalid credentials');
@@ -136,6 +139,16 @@ export class AuthService {
 
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return user;
+  }
+
+  async validateUser(email: string) {
+    const user = await this.userService.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
     return user;
@@ -164,7 +177,7 @@ export class AuthService {
   }
 
   async validateJwtUser(userId: number) {
-    const user = await this.userService.findOne(userId);
+    const user = await this.userService.findOne({ where: { id: userId } });
     const jwtUser: JwtUser = {
       userId: user.id,
       role: user.role,
