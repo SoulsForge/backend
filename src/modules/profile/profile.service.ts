@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { CharacterService } from '../character/character.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateProfileInput } from './dto/update-profile.input';
 import { UserService } from '../user/user.service';
 
 @Injectable()
@@ -56,5 +57,39 @@ export class ProfileService {
     });
 
     return profile;
+  }
+
+  async updateProfile(userId: number, data: UpdateProfileInput) {
+    const user = await this.userService.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // update the email or username if they are different from the current ones
+    if (
+      user.email !== data.email ||
+      data.email ||
+      user.username !== data.username ||
+      data.username
+    ) {
+      await this.userService.update(userId, {
+        email: data.email,
+        username: data.username,
+      });
+    }
+
+    // todo: if the email is different, send a verification email
+    // and set the email to unverified
+
+    return await this.prisma.profile.update({
+      where: {
+        userId: userId,
+      },
+      data: {
+        avatar: data.avatar,
+      },
+      include: { user: true },
+    });
   }
 }
