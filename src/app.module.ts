@@ -1,11 +1,11 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthService } from './modules/auth/auth.service';
 import { CharacterModule } from './modules/character/character.module';
-import { ConfigModule } from '@nestjs/config';
 import { EmailModule } from './modules/email/email.module';
 import { EmailService } from './modules/email/email.service';
 import GraphQLJSON from 'graphql-type-json';
@@ -27,12 +27,35 @@ import configuration from './config/configuration';
       isGlobal: true,
       load: [configuration],
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: true,
-      debug: true,
-      playground: true,
-      resolvers: { JSON: GraphQLJSON },
+      // autoSchemaFile: true,
+      // debug: true,
+      // playground: true,
+      // resolvers: { JSON: GraphQLJSON },
+      useFactory(config: ConfigService) {
+        return {
+          playground: true,
+          debug: true,
+          autoSchemaFile: true,
+          resolvers: { JSON: GraphQLJSON },
+          formatError(error) {
+            const originalError = error.extensions?.originalError as Error;
+
+            if (!originalError) {
+              return {
+                message: error.message,
+                code: error.extensions?.code,
+              };
+            }
+
+            return {
+              message: originalError.message,
+              code: error.extensions?.code,
+            };
+          },
+        };
+      },
     }),
     UserModule,
     PrismaModule,
