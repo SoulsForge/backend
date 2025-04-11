@@ -9,6 +9,7 @@ async function bootstrap() {
     logger: new ConsoleLogger({ prefix: 'SoulsForge' }),
   });
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new PrismaClientExceptionFilter());
 
   app.enableCors({
     origin: [process.env['FRONTEND_SERVER']],
