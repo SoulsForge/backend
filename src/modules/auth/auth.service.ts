@@ -41,19 +41,16 @@ export class AuthService {
         `${process.env.FRONTEND_SERVER}/verify-email`,
       );
 
-      const token = await this.generateToken(newUser.id);
-
       redirectUrl.searchParams.append('code', verificationCode || '');
-      redirectUrl.searchParams.append('token', token.accessToken);
 
       const htmlBody = `<h1>Welcome to SoulsForge</h1>
       <p>To verify your email, please use the following code:</p>
       <h2>${verificationCode}</h2>
       <br />
       <div>
-        <p>Otherwise, you can click the link below:</p>
-        <a href="${redirectUrl.toString()}">Verify Email</a>
-        <strong>Note:</strong> This link will expire in 30 days.
+      <p>Otherwise, you can click the link below:</p>
+      <a href="${redirectUrl.toString()}">Verify Email</a>
+      <strong>Note:</strong> This link will expire in 30 days.
       </div>
       <p>If you didn't create an account, please ignore this email.</p>`;
 
@@ -86,8 +83,33 @@ export class AuthService {
     return await this.userService.update(id, data);
   }
 
+  async changePassword(userId: number,oldPassword:string, newPassword: string) {
+    const user = await this.userService.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const oldPasswordMatch = await argon2.verify(user.password, oldPassword);
+
+    if (!oldPasswordMatch) {
+      throw new BadRequestException('Password does not match');
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+
+    user.password = hashedPassword;
+
+    const updatedUser = await this.userService.update(userId, user);
+
+    return updatedUser;
+  }
+
   async verify(userId: number) {
-    const user = await this.userService.findOne({ where: { id: userId }, include:{profile:true} });
+    const user = await this.userService.findOne({
+      where: { id: userId },
+      include: { profile: true },
+    });
 
     if (!user) {
       throw new BadRequestException('User not found');

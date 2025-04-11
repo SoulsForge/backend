@@ -8,6 +8,7 @@ import { Logger, UseGuards } from '@nestjs/common';
 import { GqlJwtGuard } from './guards/gql-jwt-guard/gql-jwt-guard.guard';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { JwtUser } from './types/jwt-user';
+import { UpdatePasswordInput } from './dto/update-password.input';
 
 @Resolver()
 export class AuthResolver {
@@ -38,5 +39,18 @@ export class AuthResolver {
   async verifyEmail(@GetUser() user: JwtUser, @Args('code') code: string) {
     this.logger.log(user.userId, code);
     return await this.authService.verifyEmail(user.userId, code);
+  }
+
+  @UseGuards(GqlJwtGuard)
+  @Mutation(() => UserEntity)
+  async changePassword(
+    @GetUser() user: JwtUser,
+    @Args('data') passwordInput: UpdatePasswordInput,
+  ) {
+    return await this.authService.changePassword(
+      user.userId,
+      passwordInput.oldPassword,
+      passwordInput.newPassword,
+    );
   }
 }
