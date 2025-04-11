@@ -68,10 +68,8 @@ export class ProfileService {
 
     // update the email or username if they are different from the current ones
     if (
-      user.email !== data.email ||
-      data.email ||
-      user.username !== data.username ||
-      data.username
+      (user.email !== data.email && data.email) ||
+      (user.username !== data.username && data.username)
     ) {
       await this.userService.update(userId, {
         email: data.email,
@@ -82,14 +80,19 @@ export class ProfileService {
     // todo: if the email is different, send a verification email
     // and set the email to unverified
 
-    return await this.prisma.profile.update({
-      where: {
-        userId: userId,
-      },
-      data: {
-        avatar: data.avatar,
-      },
-      include: { user: true },
-    });
+    if (user.email !== data.email && data.email) {
+      await this.userService.unvalidateEmail(userId, data.email);
+    }
+
+    if (data.email)
+      return await this.prisma.profile.update({
+        where: {
+          userId: userId,
+        },
+        data: {
+          avatar: data.avatar,
+        },
+        include: { user: true },
+      });
   }
 }

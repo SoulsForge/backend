@@ -1,13 +1,16 @@
 import { CreateUserInput } from './dto/create-user.input';
+import { EmailService } from '../email/email.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Query } from '@nestjs/graphql';
 import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   async findMany({
     skip,
@@ -80,6 +83,40 @@ export class UserService {
   async remove(id: number) {
     return await this.prisma.user.delete({
       where: { id },
+    });
+  }
+
+  async unvalidateEmail(userId: number, newEmail: string) {
+    const verificationCode = this.createRandomCode(6);
+
+    const redirectUrl = new URL(`${process.env.FRONTEND_SERVER}/verify-email`);
+
+    redirectUrl.searchParams.append('code', verificationCode || '');
+
+    const htmlBody = `<h1>Welcome to SoulsForge</h1>
+    <p>To verify your email, please use the following code:</p>
+    <h2>${verificationCode}</h2>
+    <br />
+    <div>
+    <p>Otherwise, you can click the link below:</p>
+    <a href="${redirectUrl.toString()}">Verify Email</a>
+    <strong>Note:</strong> This link will expire in 30 days.
+    </div>
+    <p>If you didn't create an account, please ignore this email.</p>`;
+
+    await this.emailService.sendMail(
+      'accounts',
+      newEmail,
+      'SoulsForge - Verify your email',
+      htmlBody,
+    );
+
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: false,
+        verificationCode,
+      },
     });
   }
 
